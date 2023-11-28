@@ -1,7 +1,8 @@
 import copy
 import numpy as np
 from commonroad.common.file_reader import CommonRoadFileReader
-from commonroad.scenario.trajectory import Trajectory, InitialState
+from commonroad.scenario.trajectory import Trajectory
+from commonroad.scenario.state import InitialState
 from commonroad.prediction.prediction import TrajectoryPrediction
 from commonroad.scenario.obstacle import DynamicObstacle, ObstacleType
 from commonroad.geometry.shape import Rectangle

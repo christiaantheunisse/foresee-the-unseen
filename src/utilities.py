@@ -10,7 +10,7 @@ from shapely.geometry import Point
 
 from commonroad.geometry.shape import Circle, Rectangle, Polygon as CommonRoadPolygon
 from commonroad.prediction.prediction import Occupancy, SetBasedPrediction
-from commonroad.scenario.trajectory import InitialState
+from commonroad.scenario.state import InitialState
 from commonroad.scenario.obstacle import ObstacleType, DynamicObstacle, StaticObstacle
 from commonroad.planning.planning_problem import PlanningProblemSet, PlanningProblem, GoalRegion
 from commonroad.common.util import Interval, AngleInterval

@@ -10,7 +10,7 @@ from shapely.ops import substring
 
 from commonroad.scenario.scenario import Scenario, Lanelet
 from commonroad.scenario.obstacle import DynamicObstacle, ObstacleType
-from commonroad.scenario.trajectory import InitialState
+from commonroad.scenario.state import InitialState
 from commonroad.prediction.prediction import SetBasedPrediction, Occupancy
 
 from utilities import Lanelet2ShapelyPolygon, ShapelyPolygon2Polygon, polygon_intersection, polygon_diff, polygon_union, cut_line
