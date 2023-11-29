@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2021-10-28 19:12:10 by Eclipse SUMO sumo Version 1.10.0
-<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+<!-- generated on 2023-11-28 17:14:37 by Eclipse SUMO libsumo Version 1.19.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/libsumoConfiguration.xsd">
 
     <input>
         <net-file value="scenarios_sumo/scenario_89_NT/DEU_Ffb-1_7_I-1-1.net.xml"/>
@@ -19,11 +19,9 @@
     </time>
 
     <processing>
-        <lateral-resolution value="0"/>
-        <ignore-route-errors value="true"/>
-        <collision.check-junctions value="true"/>
+        <lateral-resolution value="1.0"/>
         <time-to-teleport value="-1"/>
-        <lanechange.duration value="15"/>
+        <lanechange.duration value="0"/>
     </processing>
 
     <report>
@@ -31,17 +29,9 @@
         <no-step-log value="true"/>
     </report>
 
-    <traci_server>
-        <remote-port value="58207"/>
-    </traci_server>
-
     <random_number>
         <seed value="1234"/>
     </random_number>
-
-    <gui_only>
-        <tracker-interval value="0.1"/>
-    </gui_only>
 
 </configuration>
 -->

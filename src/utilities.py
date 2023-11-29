@@ -180,6 +180,7 @@ def simulation_log(percieved_scenarios, sensor_range_shapes, directory, goal_rea
     occluded_areas = []
     for scenario, sensor_range_shape in zip(percieved_scenarios, sensor_range_shapes):
         occluded_areas.append(calculate_occluded_area(scenario, sensor_range_shape))
+    print(len(occluded_areas))
     average_occluded_area = sum(occluded_areas)/len(occluded_areas)
 
     # Save the logs in a file

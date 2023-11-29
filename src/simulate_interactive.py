@@ -40,10 +40,13 @@ def simulate_interactive(scenario_path):
     config.scenarios_path = None
     wrapper = ScenarioWrapper.init_from_scenario(config, scenario_path, cr_map_file=cr_file)
     sumo_sim = SumoSimulation()
-    try:
-        sumo_sim.initialize(config, wrapper, planning_problems)
-    except:
-        sumo_sim.stop()
+    
+    sumo_sim.initialize(config, wrapper, planning_problems)
+    # try:
+    #     sumo_sim.initialize(config, wrapper, planning_problems)
+    # except:
+    #     print("Iitialization failed")
+    #     sumo_sim.stop()
     planner = Planner(initial_state,
                       vehicle_shape=Rectangle(configuration.get('vehicle_length'),
                                               configuration.get('vehicle_width')),
