@@ -72,7 +72,7 @@ class Shadow:
             t_steps.append(time.time())  # LOG RUNTIME
             pred_polygon_shapely = self.__build_polygon(bottom_right, bottom_left, top_right, top_left)
             t_steps.append(time.time())  # LOG RUNTIME
-            print(f"step {i}{' ' * (3 - len(str(i)))}: {pred_polygon_shapely}")
+            # print(f"step {i}{' ' * (3 - len(str(i)))}: {pred_polygon_shapely}")
             pred_polygon = ShapelyPolygon2Polygon(pred_polygon_shapely)
             t_steps.append(time.time())  # LOG RUNTIME
             occupancy = Occupancy(time_step+i+1, pred_polygon)
@@ -84,8 +84,8 @@ class Shadow:
             time_steps.append(t_steps)
 
         time_steps = np.array(time_steps)
-        print(f"[get_occupancy_set] Time per step:\n{time_steps.mean(axis=0).tolist()}")
-        print(f"[get_occupancy_set] Percentage of time per step:\n{(time_steps.mean(axis=0) / (time_steps.sum() / time_steps.shape[0]) * 100).tolist()}")      
+        # print(f"[get_occupancy_set] Time per step:\n{time_steps.mean(axis=0).tolist()}")
+        # print(f"[get_occupancy_set] Percentage of time per step:\n{(time_steps.mean(axis=0) / (time_steps.sum() / time_steps.shape[0]) * 100).tolist()}")      
 
         # Populate the rest of the planning horizon with the last prediction
         for i in range(prediction_horizon, planning_horizon):
@@ -172,6 +172,18 @@ class Occlusion_tracker:
             for lane in current_lanes:
                 lanes.append(lane)
         self.lanes = lanes
+
+        # ========== Find only the 3 relevant lanes for the `parked_vehicle_scenario` ==========
+        lanelets_dict = {}
+        for lanelet in scenario.lanelet_network.lanelets:
+            lanelets_dict[lanelet.lanelet_id] = lanelet
+
+        self.lanes = []
+        _lane = Lanelet.merge_lanelets(lanelets_dict[49574], lanelets_dict[49600])
+        self.lanes.append(Lanelet.merge_lanelets(_lane, lanelets_dict[49566]))
+        self.lanes.append(Lanelet.merge_lanelets(lanelets_dict[49574], lanelets_dict[49590]))
+        self.lanes.append(Lanelet.merge_lanelets(lanelets_dict[49564], lanelets_dict[49602]))
+        # ==================== END ====================
 
         # Calculate the first "view"
         for lane in self.lanes:
@@ -293,9 +305,9 @@ class Occlusion_tracker:
             time_steps.append(t_steps)
 
         time_steps = np.array(time_steps)
-        print(f"[shadows] Time per step:\n{time_steps.mean(axis=0).tolist()}")
-        print(f"[shadows] Percentage of time per step:\n{(time_steps.mean(axis=0) / (time_steps.sum() / time_steps.shape[0]) * 100).tolist()}")      
-        print("")
+        # print(f"[shadows] Time per step:\n{time_steps.mean(axis=0).tolist()}")
+        # print(f"[shadows] Percentage of time per step:\n{(time_steps.mean(axis=0) / (time_steps.sum() / time_steps.shape[0]) * 100).tolist()}")      
+        # print("")
 
         return dynamic_obstacles
 

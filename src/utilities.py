@@ -137,6 +137,10 @@ def add_no_stop_zone_DEU_Ffb(scenario, planning_horizon, safety_margin=5):
         horizontal_lanes[0], vertical_lanes[0])
     no_stop_polygon = ShapelyPolygon2Polygon(no_stop_shapely[0].convex_hull.buffer(safety_margin))
 
+    ### Remove lanelets
+    scenario.remove_lanelet(scenario.lanelet_network.find_lanelet_by_id(49598), referenced_elements=True)
+    scenario.remove_lanelet(scenario.lanelet_network.find_lanelet_by_id(49596), referenced_elements=True)
+
     dummy_state = InitialState(position=np.array(
         [0, 0]), orientation=0, velocity=0, time_step=planning_horizon)
     occupancy = Occupancy(planning_horizon, no_stop_polygon)
