@@ -39,6 +39,7 @@ class Shadow:
         # Calculate the right and left projections
         right_projections = []
         left_projections = []
+
         for edge in self.polygon.exterior.coords:
             right_projections.append(self.right_line.project(ShapelyPoint(edge)))
             left_projections.append(self.left_line.project(ShapelyPoint(edge)))
@@ -49,25 +50,48 @@ class Shadow:
         top_right = max(right_projections)
         top_left = max(left_projections)
 
+        # print(f"bottom_right: {bottom_right}")
+        # print(f"top_right: {top_right}")
+        # print(f"bottom_left: {bottom_left}")
+        # print(f"top_left: {top_left}")
+        # print('-'*50)
+
+        ### THIS IS THE MOST TIME CONSUMING STEP IN THE WHOLE CODE
+        time_steps = []
         for i in range(prediction_horizon):
+            t_steps = [time.time()]  # LOG RUNTIME
             # Extend the top edges without overpasing the length of the lane
+            #   the front and rear of the prediction sets are always made perpendicular to the path / flat.
             new_top_right = max(top_right + dist, self.right_line.project(self.left_line.interpolate(top_left + dist)))
             new_top_left = max(top_left + dist, self.left_line.project(self.right_line.interpolate(top_right + dist)))
             top_right = new_top_right
             top_left = new_top_left
             top_right = min(top_right, self.right_line.length)
             top_left = min(top_left, self.left_line.length)
-
+            
+            t_steps.append(time.time())  # LOG RUNTIME
             pred_polygon_shapely = self.__build_polygon(bottom_right, bottom_left, top_right, top_left)
+            t_steps.append(time.time())  # LOG RUNTIME
+            print(f"step {i}{' ' * (3 - len(str(i)))}: {pred_polygon_shapely}")
             pred_polygon = ShapelyPolygon2Polygon(pred_polygon_shapely)
+            t_steps.append(time.time())  # LOG RUNTIME
             occupancy = Occupancy(time_step+i+1, pred_polygon)
             occupancy_set.append(occupancy)
+    
+            t_steps.append(time.time())  # LOG RUNTIME
+            t_steps = np.array(t_steps)
+            t_steps = t_steps[1:] - t_steps[:-1]
+            time_steps.append(t_steps)
+
+        time_steps = np.array(time_steps)
+        print(f"[get_occupancy_set] Time per step:\n{time_steps.mean(axis=0).tolist()}")
+        print(f"[get_occupancy_set] Percentage of time per step:\n{(time_steps.mean(axis=0) / (time_steps.sum() / time_steps.shape[0]) * 100).tolist()}")      
 
         # Populate the rest of the planning horizon with the last prediction
         for i in range(prediction_horizon, planning_horizon):
             occupancy = Occupancy(time_step+i+1, pred_polygon)
             occupancy_set.append(occupancy)
-
+        
         return occupancy_set
 
     def __get_next_occ(self, poly, dist):
@@ -220,23 +244,59 @@ class Occlusion_tracker:
 
     def get_dynamic_obstacles(self, scenario):
         dynamic_obstacles = []
+
+        print(f"There are {len(self.shadows)} shadows")
+        # print(f"Timestep: {self.time_step}, dt: {self.dt}")
+        # import matplotlib.pyplot as plt
+        # import matplotlib.cm as cm
+        # # cmap = cm.get_cmap('hot')
+        # # color = cmap((self.time_step / 3) % 1)
+        # fig, axs = plt.subplots(int(len(self.shadows) / 3) + 1, 3)
+        # for idx, shadow in enumerate(self.shadows):
+        #     # plt.plot(*shadow.polygon.exterior.xy, color=color)
+        #     ax = axs.flatten()[idx]
+        #     ax.plot(*shadow.polygon.exterior.xy)
+        #     ax.set_xlim(60, 200)
+        #     ax.set_ylim(-13, 13)
+        #     ax.set_aspect('equal')
+        #     # ax.set_xlim(0, 100)
+        #     # ax.set_ylim(-40, 40)
+        # plt.show()
+
+        import time
+        time_steps = []
         for shadow in self.shadows:
+            t_steps = [time.time()]  # LOG RUNTIME
             occupancies = []
             occupancy_set = shadow.get_occupancy_set(self.time_step, self.dt, self.max_vel, self.prediction_horizon)
+            t_steps.append(time.time())  # LOG RUNTIME
             obstacle_id = scenario.generate_object_id()
             obstacle_type = ObstacleType.UNKNOWN
+            t_steps.append(time.time())  # LOG RUNTIME
             obstacle_shape = ShapelyPolygon2Polygon(shadow.polygon)
             obstacle_initial_state = InitialState(position = np.array([0,0]),
                                            velocity = self.max_vel,
                                            orientation = 0,
                                            time_step = self.time_step)
+            t_steps.append(time.time())  # LOG RUNTIME
             obstacle_prediction = SetBasedPrediction(self.time_step+1, occupancy_set)
+            t_steps.append(time.time())  # LOG RUNTIME
             dynamic_obstacle = DynamicObstacle(obstacle_id,
                             obstacle_type,
                             obstacle_shape,
                             obstacle_initial_state,
                             obstacle_prediction)
             dynamic_obstacles.append(dynamic_obstacle)
+            t_steps.append(time.time())  # LOG RUNTIME
+            t_steps = np.array(t_steps)
+            t_steps = t_steps[1:] - t_steps[:-1]
+            time_steps.append(t_steps)
+
+        time_steps = np.array(time_steps)
+        print(f"[shadows] Time per step:\n{time_steps.mean(axis=0).tolist()}")
+        print(f"[shadows] Percentage of time per step:\n{(time_steps.mean(axis=0) / (time_steps.sum() / time_steps.shape[0]) * 100).tolist()}")      
+        print("")
+
         return dynamic_obstacles
 
     def get_currently_occluded_area(self):

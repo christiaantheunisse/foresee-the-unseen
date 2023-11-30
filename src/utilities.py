@@ -99,6 +99,7 @@ def cut_line(line, bottom_dis, top_dis):
     # Line cutting algorithm
     points = []
     points.append(line.interpolate(bottom_dis).coords[0])
+    
     for edge in line.coords:
         edge_dis = line.project(Point(edge))
         if bottom_dis < edge_dis:
@@ -107,6 +108,7 @@ def cut_line(line, bottom_dis, top_dis):
             else:
                 break
     points.append(line.interpolate(top_dis).coords[0])
+
     return points
 
 

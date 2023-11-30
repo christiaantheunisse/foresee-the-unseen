@@ -1,5 +1,5 @@
 #GENERAL
-simulation_duration : 50
+simulation_duration : 2
 
 #EGO_VEHICLE
 initial_state_x : 70
@@ -23,7 +23,7 @@ safety_margin : 5
 #SENSOR
 field_of_view_degrees : 360
 min_resolution : 1
-view_range : 100
+view_range : 400
 
 #OCCLUSION_TRACKER
 min_velocity : 0

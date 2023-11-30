@@ -1,5 +1,6 @@
 import copy
 import numpy as np
+import time
 from commonroad.common.file_reader import CommonRoadFileReader
 from commonroad.scenario.trajectory import Trajectory
 from commonroad.scenario.state import InitialState
@@ -38,6 +39,7 @@ def step_vehicle(vehicle):
 
 
 def step_simulation(scenario, configuration):
+    start_time = time.time()
     driven_state_list = []
     percieved_scenarios = []
     sensor_views = []
@@ -79,31 +81,55 @@ def step_simulation(scenario, configuration):
                       max_deceleration=configuration.get('max_deceleration'),
                       time_horizon=configuration.get('planning_horizon'))
     simulation_steps = configuration.get('simulation_duration')
+
+    init_time = time.time()
+    print(f"Initialization took: {init_time - start_time} s")
+    time_steps = []
+    detailed_time_steps = []
     for step in range(simulation_steps+1):
+        step_time = time.time()
+        t_steps = [time.time()] # log runtime
         # Start with an empty percieved scenario
         percieved_scenario = copy.deepcopy(scenario)
         for obstacle in percieved_scenario.obstacles:
             percieved_scenario.remove_obstacle(obstacle)
+        t_steps.append(time.time()) # log runtime
 
         # Update the sensor and get the sensor view and the list of observed obstacles
         sensor.update(ego_vehicle.initial_state) # initial_state is current state
         sensor_view = sensor.get_sensor_view(scenario)
         observed_obstacles, _ = sensor.get_observed_obstacles(sensor_view, scenario)
         percieved_scenario.add_objects(observed_obstacles)
+        t_steps.append(time.time()) # log runtime
 
         # Update the tracker with the new sensor view and get the prediction for the shadows
+        ### THIS code uses at least 95% of the time
+        d_t_steps = [time.time()] # log DETAILED runtime
+        ## 5% of the 95%
         occ_track.update(sensor_view, ego_vehicle.initial_state.time_step)
+        d_t_steps.append(time.time()) # log DETAILED runtime
+        ## 95% of the 95%
         shadow_obstacles = occ_track.get_dynamic_obstacles(percieved_scenario)
+        d_t_steps.append(time.time()) # log DETAILED runtime
+        ## 0% of the 95%
         percieved_scenario.add_objects(shadow_obstacles)
+        d_t_steps.append(time.time()) # log DETAILED runtime
+
+        d_t_steps = np.array(d_t_steps)
+        d_t_steps = d_t_steps[1:] - d_t_steps[:-1]
+        detailed_time_steps.append(d_t_steps)
+
+        t_steps.append(time.time()) # log runtime
 
         # Update the planner and plan a trajectory
-        #if
+        # if
         add_no_stop_zone_DEU_Ffb(percieved_scenario, step + configuration.get('planning_horizon'), configuration.get('safety_margin'))
         planner.update(ego_vehicle.initial_state)
         collision_free_trajectory = planner.plan(percieved_scenario)
         if collision_free_trajectory:
             ego_vehicle.prediction = collision_free_trajectory
         # else, if no trajectory found, keep previous collision free trajectory
+        t_steps.append(time.time()) # log runtime
 
         # Add the ego vehicle to the perceived scenario
         percieved_scenario.add_objects(ego_vehicle)
@@ -114,6 +140,20 @@ def step_simulation(scenario, configuration):
 
         ego_vehicle = step_vehicle(ego_vehicle)
         scenario = step_scenario(scenario)
+        t_steps.append(time.time()) # log runtime
+
+        print(f"Step {step}: took {time.time() - step_time} s")
+        t_steps = np.array(t_steps)
+        t_steps = t_steps[1:] - t_steps[:-1]
+        time_steps.append(t_steps)
+
+    print(f"Simulation took: {time.time() - init_time} s")
+    time_steps = np.array(time_steps)
+    print(f"Time per step:\n{time_steps.mean(axis=0)}")
+    print(f"Percentage of time per step:\n{time_steps.mean(axis=0) / (time_steps.sum() / time_steps.shape[0]) * 100}")    
+    detailed_time_steps = np.array(detailed_time_steps)
+    print(f"Time per DETAILED step:\n{detailed_time_steps.mean(axis=0)}")
+    print(f"Percentage of time per DETAILED step:\n{detailed_time_steps.mean(axis=0) / (detailed_time_steps.sum() / detailed_time_steps.shape[0]) * 100}")    
 
     # Set initial_state to initial state and not current
     ego_vehicle.initial_state = driven_state_list.pop(0)
