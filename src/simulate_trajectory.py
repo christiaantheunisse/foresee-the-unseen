@@ -5,7 +5,7 @@ from commonroad.common.file_reader import CommonRoadFileReader
 from commonroad.scenario.trajectory import Trajectory
 from commonroad.scenario.state import InitialState
 from commonroad.prediction.prediction import TrajectoryPrediction
-from commonroad.scenario.obstacle import DynamicObstacle, ObstacleType
+from commonroad.scenario.obstacle import DynamicObstacle, ObstacleType, StaticObstacle
 from commonroad.geometry.shape import Rectangle
 
 from planner import Planner
@@ -82,6 +82,23 @@ def step_simulation(scenario, configuration):
                       time_horizon=configuration.get('planning_horizon'))
     simulation_steps = configuration.get('simulation_duration')
 
+    ### Add my own obstacle
+    obstacle_shape = Rectangle(5, 2.2)
+    obstacle_state1 = InitialState(position=np.array([6, -18]), orientation=np.pi/2, time_step=0)
+    detected_car1 = StaticObstacle(scenario.generate_object_id(),
+                                  ObstacleType.CAR,
+                                  obstacle_shape,
+                                  obstacle_state1,
+                                  )
+    obstacle_state2 = InitialState(position=np.array([-6, -18]), orientation=np.pi/2, time_step=0)
+    detected_car2 = StaticObstacle(scenario.generate_object_id(),
+                                  ObstacleType.CAR,
+                                  obstacle_shape,
+                                  obstacle_state2,
+                                  )
+    ### Add my static object
+    scenario.add_objects([detected_car1, detected_car2])
+
     init_time = time.time()
     print(f"Initialization took: {init_time - start_time} s")
     time_steps = []
@@ -89,6 +106,7 @@ def step_simulation(scenario, configuration):
     for step in range(simulation_steps+1):
         step_time = time.time()
         t_steps = [time.time()] # log runtime
+
         # Start with an empty percieved scenario
         percieved_scenario = copy.deepcopy(scenario)
         for obstacle in percieved_scenario.obstacles:
@@ -100,6 +118,7 @@ def step_simulation(scenario, configuration):
         sensor_view = sensor.get_sensor_view(scenario)
         observed_obstacles, _ = sensor.get_observed_obstacles(sensor_view, scenario)
         percieved_scenario.add_objects(observed_obstacles)
+        
         t_steps.append(time.time()) # log runtime
 
         # Update the tracker with the new sensor view and get the prediction for the shadows
