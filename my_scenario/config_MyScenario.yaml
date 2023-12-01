@@ -3,7 +3,7 @@ simulation_duration : 50
 
 #EGO_VEHICLE
 initial_state_x : 2
-initial_state_y : -40
+initial_state_y : -30
 initial_state_orientation: 1.57
 initial_state_velocity: 8.3333
 
