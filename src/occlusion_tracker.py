@@ -177,10 +177,19 @@ class Occlusion_tracker:
             lanelets_dict[lanelet.lanelet_id] = lanelet
 
         self.lanes = []
-        _lane = Lanelet.merge_lanelets(lanelets_dict[49574], lanelets_dict[49600])
-        self.lanes.append(Lanelet.merge_lanelets(_lane, lanelets_dict[49566]))
-        self.lanes.append(Lanelet.merge_lanelets(lanelets_dict[49574], lanelets_dict[49590]))
-        self.lanes.append(Lanelet.merge_lanelets(lanelets_dict[49564], lanelets_dict[49602]))
+        if scenario.scenario_id.map_name == "MyIntersection":
+            _lane = Lanelet.merge_lanelets(lanelets_dict[17], lanelets_dict[16])
+            self.lanes.append(Lanelet.merge_lanelets(_lane, lanelets_dict[15]))
+            self.lanes.append(Lanelet.merge_lanelets(lanelets_dict[17], lanelets_dict[30]))
+            self.lanes.append(Lanelet.merge_lanelets(lanelets_dict[12], lanelets_dict[13]))
+        elif scenario.scenario_id.map_name == "Ffb":
+            _lane = Lanelet.merge_lanelets(lanelets_dict[49574], lanelets_dict[49600])
+            self.lanes.append(Lanelet.merge_lanelets(_lane, lanelets_dict[49566]))
+            self.lanes.append(Lanelet.merge_lanelets(lanelets_dict[49574], lanelets_dict[49590]))
+            self.lanes.append(Lanelet.merge_lanelets(lanelets_dict[49564], lanelets_dict[49602]))
+
+        # my scenario
+
         # ==================== END ====================
 
         # Calculate the first "view"

@@ -121,25 +121,29 @@ def add_building_DEU_Ffb(scenario):
 
 
 def add_no_stop_zone_DEU_Ffb(scenario, planning_horizon, safety_margin=5):
-    lanelet_1 = scenario.lanelet_network.find_lanelet_by_id(
-        49602).convert_to_polygon()
-    lanelet_2 = scenario.lanelet_network.find_lanelet_by_id(
-        49600).convert_to_polygon()
-    lanelet_3 = scenario.lanelet_network.find_lanelet_by_id(
-        49598).convert_to_polygon()
-    lanelet_4 = scenario.lanelet_network.find_lanelet_by_id(
-        49596).convert_to_polygon()
-    horizontal_lanes = polygon_union(
-        [lanelet_1._shapely_polygon, lanelet_2._shapely_polygon])
-    vertical_lanes = polygon_union(
-        [lanelet_3._shapely_polygon, lanelet_4._shapely_polygon])
-    no_stop_shapely = polygon_intersection(
-        horizontal_lanes[0], vertical_lanes[0])
-    no_stop_polygon = ShapelyPolygon2Polygon(no_stop_shapely[0].convex_hull.buffer(safety_margin))
+    if scenario.scenario_id.map_name == "MyIntersection":
+        no_stop_shapely = [scenario.lanelet_network.find_lanelet_by_id(32).convert_to_polygon()._shapely_polygon]
+    elif scenario.scenario_id.map_name == "Ffb":
+        lanelet_1 = scenario.lanelet_network.find_lanelet_by_id(
+            49602).convert_to_polygon()
+        lanelet_2 = scenario.lanelet_network.find_lanelet_by_id(
+            49600).convert_to_polygon()
+        lanelet_3 = scenario.lanelet_network.find_lanelet_by_id(
+            49598).convert_to_polygon()
+        lanelet_4 = scenario.lanelet_network.find_lanelet_by_id(
+            49596).convert_to_polygon()
+        horizontal_lanes = polygon_union(
+            [lanelet_1._shapely_polygon, lanelet_2._shapely_polygon])
+        vertical_lanes = polygon_union(
+            [lanelet_3._shapely_polygon, lanelet_4._shapely_polygon])
+        no_stop_shapely = polygon_intersection(
+            horizontal_lanes[0], vertical_lanes[0])
 
-    ### Remove lanelets
-    scenario.remove_lanelet(scenario.lanelet_network.find_lanelet_by_id(49598), referenced_elements=True)
-    scenario.remove_lanelet(scenario.lanelet_network.find_lanelet_by_id(49596), referenced_elements=True)
+        ### Remove lanelets
+        scenario.remove_lanelet(scenario.lanelet_network.find_lanelet_by_id(49598), referenced_elements=True)
+        scenario.remove_lanelet(scenario.lanelet_network.find_lanelet_by_id(49596), referenced_elements=True)
+
+    no_stop_polygon = ShapelyPolygon2Polygon(no_stop_shapely[0].convex_hull.buffer(safety_margin))
 
     dummy_state = InitialState(position=np.array(
         [0, 0]), orientation=0, velocity=0, time_step=planning_horizon)

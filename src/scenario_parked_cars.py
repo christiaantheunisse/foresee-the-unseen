@@ -21,8 +21,11 @@ def plot(time_step, ego_vehicle, scenarios, sensor_views):
 
 
 if __name__ == "__main__":
-    with open("scenario_parked_cars/config_parked.yaml") as file:
+    # with open("scenario_parked_cars/config_parked.yaml") as file:
+    with open("my_scenario/config_MyScenario.yaml") as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
-    scenario1, _ = CommonRoadFileReader("scenario_parked_cars/DEU_Ffb-1_parked.xml").open()
-    scenario2, _ = CommonRoadFileReader("scenario_parked_cars/DEU_Ffb-1_parked.xml").open()
+    # scenario1, _ = CommonRoadFileReader("scenario_parked_cars/DEU_Ffb-1_parked.xml").open()
+    # scenario2, _ = CommonRoadFileReader("scenario_parked_cars/DEU_Ffb-1_parked.xml").open()
+    scenario1, _ = CommonRoadFileReader("my_scenario/ZAM_MyIntersection-1_1_T-1.xml").open()
+    scenario2, _ = CommonRoadFileReader("my_scenario/ZAM_MyIntersection-1_1_T-1.xml").open()
     track_vehicle, tracked_scenarios, tracked_views = step_simulation(scenario1, config)
