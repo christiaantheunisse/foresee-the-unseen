@@ -148,12 +148,12 @@ def step_simulation(scenario, configuration):
         time_steps.append(t_steps)
 
     print(f"Simulation took: {time.time() - init_time} s")
-    time_steps = np.array(time_steps)
-    print(f"Time per step:\n{time_steps.mean(axis=0)}")
-    print(f"Percentage of time per step:\n{time_steps.mean(axis=0) / (time_steps.sum() / time_steps.shape[0]) * 100}")    
-    detailed_time_steps = np.array(detailed_time_steps)
-    print(f"Time per DETAILED step:\n{detailed_time_steps.mean(axis=0)}")
-    print(f"Percentage of time per DETAILED step:\n{detailed_time_steps.mean(axis=0) / (detailed_time_steps.sum() / detailed_time_steps.shape[0]) * 100}")    
+    # time_steps = np.array(time_steps)
+    # print(f"Time per step:\n{time_steps.mean(axis=0)}")
+    # print(f"Percentage of time per step:\n{time_steps.mean(axis=0) / (time_steps.sum() / time_steps.shape[0]) * 100}")    
+    # detailed_time_steps = np.array(detailed_time_steps)
+    # print(f"Time per DETAILED step:\n{detailed_time_steps.mean(axis=0)}")
+    # print(f"Percentage of time per DETAILED step:\n{detailed_time_steps.mean(axis=0) / (detailed_time_steps.sum() / detailed_time_steps.shape[0]) * 100}")    
 
     # Set initial_state to initial state and not current
     ego_vehicle.initial_state = driven_state_list.pop(0)

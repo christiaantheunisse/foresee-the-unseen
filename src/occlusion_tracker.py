@@ -57,36 +57,34 @@ class Shadow:
         # print('-'*50)
 
         ### THIS IS THE MOST TIME CONSUMING STEP IN THE WHOLE CODE
-        time_steps = []
+        # reduce the number of predictions steps, but keep the same horizon
+        red_factor = 5
+        assert prediction_horizon % red_factor == 0, \
+            f"Number of steps on the prediction horizon should be dividable by {red_factor}"
+        red_prediction_horizon = prediction_horizon // red_factor
+        dist *= red_factor
+
         for i in range(prediction_horizon):
-            t_steps = [time.time()]  # LOG RUNTIME
             # Extend the top edges without overpasing the length of the lane
             #   the front and rear of the prediction sets are always made perpendicular to the path / flat.
-            new_top_right = max(top_right + dist, self.right_line.project(self.left_line.interpolate(top_left + dist)))
-            new_top_left = max(top_left + dist, self.left_line.project(self.right_line.interpolate(top_right + dist)))
-            top_right = new_top_right
-            top_left = new_top_left
-            top_right = min(top_right, self.right_line.length)
-            top_left = min(top_left, self.left_line.length)
+            if i % 5 == 0:
+                new_top_right = max(top_right + dist, self.right_line.project(self.left_line.interpolate(top_left + dist)))
+                new_top_left = max(top_left + dist, self.left_line.project(self.right_line.interpolate(top_right + dist)))
+                top_right = new_top_right
+                top_left = new_top_left
+                top_right = min(top_right, self.right_line.length)
+                top_left = min(top_left, self.left_line.length)
+                
+                # print(f"top_right: {top_right}")
+                # print(f"top_left: {top_left}")
+
+                pred_polygon_shapely = self.__build_polygon(bottom_right, bottom_left, top_right, top_left)
+                pred_polygon = ShapelyPolygon2Polygon(pred_polygon_shapely)
             
-            t_steps.append(time.time())  # LOG RUNTIME
-            pred_polygon_shapely = self.__build_polygon(bottom_right, bottom_left, top_right, top_left)
-            t_steps.append(time.time())  # LOG RUNTIME
-            # print(f"step {i}{' ' * (3 - len(str(i)))}: {pred_polygon_shapely}")
-            pred_polygon = ShapelyPolygon2Polygon(pred_polygon_shapely)
-            t_steps.append(time.time())  # LOG RUNTIME
             occupancy = Occupancy(time_step+i+1, pred_polygon)
+            # occupancy_set.extend([occupancy for _ in range(red_factor)])
             occupancy_set.append(occupancy)
-    
-            t_steps.append(time.time())  # LOG RUNTIME
-            t_steps = np.array(t_steps)
-            t_steps = t_steps[1:] - t_steps[:-1]
-            time_steps.append(t_steps)
-
-        time_steps = np.array(time_steps)
-        # print(f"[get_occupancy_set] Time per step:\n{time_steps.mean(axis=0).tolist()}")
-        # print(f"[get_occupancy_set] Percentage of time per step:\n{(time_steps.mean(axis=0) / (time_steps.sum() / time_steps.shape[0]) * 100).tolist()}")      
-
+        
         # Populate the rest of the planning horizon with the last prediction
         for i in range(prediction_horizon, planning_horizon):
             occupancy = Occupancy(time_step+i+1, pred_polygon)
@@ -257,7 +255,7 @@ class Occlusion_tracker:
     def get_dynamic_obstacles(self, scenario):
         dynamic_obstacles = []
 
-        print(f"There are {len(self.shadows)} shadows")
+        # print(f"There are {len(self.shadows)} shadows")
         # print(f"Timestep: {self.time_step}, dt: {self.dt}")
         # import matplotlib.pyplot as plt
         # import matplotlib.cm as cm
