@@ -5,6 +5,12 @@ sys.path.insert(0, "src/")
 from commonroad.common.file_reader import CommonRoadFileReader
 from simulate_trajectory import step_simulation
 import yaml
+import argparse
+
+parser = argparse.ArgumentParser(description='Argument Parser')
+parser.add_argument("--no_runs", type=int, default=10)
+args = parser.parse_args()
+
 
 with open("my_scenario/config_MyScenario.yaml") as file:
     config = yaml.load(file, Loader=yaml.FullLoader)
@@ -56,7 +62,7 @@ def mean_time_dicts(time_dicts):
     return avg_dict
 
 time_dicts = []
-for _ in range(10):
+for _ in range(args.no_runs):
     _, _, _, time_dict = step_simulation(scenario1, config)
     time_dicts.append(time_dict)
 
