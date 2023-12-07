@@ -161,6 +161,7 @@ class Visualizer:
                 obstacle_type=ObstacleType.UNKNOWN)
             scenario.remove_obstacle(shadow_obstacles)
 
+            # prints until timestep 20
             self.draw_shadows(rnd, shadow_obstacles, time_begin, 20)
             scenario.draw(rnd)
 

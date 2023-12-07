@@ -1,5 +1,5 @@
 #GENERAL
-simulation_duration : 50
+simulation_duration : 100
 
 #EGO_VEHICLE
 initial_state_x : 2
@@ -18,7 +18,7 @@ reference_speed : 8.3333
 max_acceleration : 3.5
 max_deceleration : 5
 planning_horizon : 50
-safety_margin : 8
+safety_margin : 5
 
 #SENSOR
 field_of_view_degrees : 360

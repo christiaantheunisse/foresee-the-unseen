@@ -19,7 +19,7 @@ vehicle_shape:
     opacity: 1.0
     facecolor: '#ffff00'
     edgecolor: '#000000'
-    linewidth: 0.5
+    linewidth: 2
     zorder: 20
     draw_mesh: false
   occupancy:
@@ -139,7 +139,7 @@ occupancy:
     time_begin: 0
     time_end: 1
     antialiased: true
-    opacity: 0.2
+    opacity: 0.1
     facecolor: '#0000ff'
     edgecolor: '#0000ff'
     linewidth: 0.5

@@ -130,7 +130,7 @@ def step_simulation(scenario, configuration):
         This does not working with plotting, so change to a dynamic obstacle.
     """
     car_shape = Rectangle(configuration.get('vehicle_length'), configuration.get('vehicle_width'))
-    obstacle_state1 = InitialState(position=np.array([50, -2]), orientation=0, time_step=0)
+    obstacle_state1 = InitialState(position=np.array([7, -18]), orientation=0, time_step=0)
     parked_car1 = StaticObstacle(scenario.generate_object_id(),
                                   ObstacleType.CAR,
                                   car_shape,
@@ -142,7 +142,7 @@ def step_simulation(scenario, configuration):
                                   car_shape,
                                   obstacle_state2,
                                   )
-    # scenario.add_objects([parked_car1, parked_car2])
+    scenario.add_objects([parked_car1, parked_car2])
     # scenario.add_objects(parked_car2)
     # scenario.remove_obstacle(parked_car2)
 
@@ -156,7 +156,7 @@ def step_simulation(scenario, configuration):
                                         obstacle_type=ObstacleType.CAR,
                                         obstacle_shape=car_shape,
                                         initial_state=driving_car_initial_state)
-    # scenario.add_objects(driving_car)
+    scenario.add_objects(driving_car)
     # obstacle_prediction = SetBasedPrediction(self.time_step+1, occupancy_set)
 
     init_time = time.time()
@@ -166,24 +166,6 @@ def step_simulation(scenario, configuration):
     for step in range(simulation_steps+1):
         step_time = time.time()
         t_steps = [time.time()] # log runtime
-
-        ### Simulate a moving obstacle
-        # make a trajectory for the coming time step(s)
-        # scenario.remove_obstacle(driving_car)
-        # current_time_step = ego_vehicle.initial_state.time_step
-        # new_state = InitialState(position=driving_car.initial_state.position - scenario.dt * configuration['max_velocity'],
-        #                          orientation=0,
-        #                          time_step=current_time_step + 1)
-        # trajectory = Trajectory(ego_vehicle.initial_state.time_step + 1, [new_state])
-        # driving_car_pred = TrajectoryPrediction(trajectory, car_shape)
-        # driving_car = DynamicObstacle(driving_car.obstacle_id,
-        #                             driving_car.obstacle_type,
-        #                             driving_car.obstacle_shape,
-        #                             driving_car.prediction.trajectory.state_list[0],  # first state of trajectory
-        #                             prediction=driving_car_pred)
-        # scenario.add_objects(driving_car)
-        # print(f"position of car: {driving_car.initial_state.position}")
-
 
         # Start with an empty percieved scenario
         percieved_scenario = copy.deepcopy(scenario)
