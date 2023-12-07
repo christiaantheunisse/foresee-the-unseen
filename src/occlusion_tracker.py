@@ -64,6 +64,7 @@ class Shadow:
         red_prediction_horizon = prediction_horizon // red_factor
         dist *= red_factor
 
+        time_start = time.time()
         for i in range(prediction_horizon):
             # Extend the top edges without overpasing the length of the lane
             #   the front and rear of the prediction sets are always made perpendicular to the path / flat.
@@ -84,13 +85,14 @@ class Shadow:
             occupancy = Occupancy(time_step+i+1, pred_polygon)
             # occupancy_set.extend([occupancy for _ in range(red_factor)])
             occupancy_set.append(occupancy)
-        
+        time_tot = time.time() - time_start
+
         # Populate the rest of the planning horizon with the last prediction
         for i in range(prediction_horizon, planning_horizon):
             occupancy = Occupancy(time_step+i+1, pred_polygon)
             occupancy_set.append(occupancy)
         
-        return occupancy_set
+        return occupancy_set, time_tot
 
     def __get_next_occ(self, poly, dist):
         smallest_projection = 999999
@@ -284,22 +286,21 @@ class Occlusion_tracker:
 
         import time
         time_steps = []
+        time_occupancy_sets = []
         for shadow in self.shadows:
             t_steps = [time.time()]  # LOG RUNTIME
             occupancies = []
-            occupancy_set = shadow.get_occupancy_set(self.time_step, self.dt, self.max_vel, self.prediction_horizon)
+            occupancy_set, t_occupancy_set = shadow.get_occupancy_set(self.time_step, self.dt, self.max_vel, self.prediction_horizon)
+            time_occupancy_sets.append(t_occupancy_set)            
             t_steps.append(time.time())  # LOG RUNTIME
             obstacle_id = scenario.generate_object_id()
             obstacle_type = ObstacleType.UNKNOWN
-            t_steps.append(time.time())  # LOG RUNTIME
             obstacle_shape = ShapelyPolygon2Polygon(shadow.polygon)
             obstacle_initial_state = InitialState(position = np.array([0,0]),
                                            velocity = self.max_vel,
                                            orientation = 0,
                                            time_step = self.time_step)
-            t_steps.append(time.time())  # LOG RUNTIME
             obstacle_prediction = SetBasedPrediction(self.time_step+1, occupancy_set)
-            t_steps.append(time.time())  # LOG RUNTIME
             dynamic_obstacle = DynamicObstacle(obstacle_id,
                             obstacle_type,
                             obstacle_shape,
@@ -312,11 +313,12 @@ class Occlusion_tracker:
             time_steps.append(t_steps)
 
         time_steps = np.array(time_steps)
+        time_occupancy_sets = np.array(time_occupancy_sets)
         # print(f"[shadows] Time per step:\n{time_steps.mean(axis=0).tolist()}")
         # print(f"[shadows] Percentage of time per step:\n{(time_steps.mean(axis=0) / (time_steps.sum() / time_steps.shape[0]) * 100).tolist()}")      
         # print("")
 
-        return dynamic_obstacles
+        return dynamic_obstacles, time_steps, time_occupancy_sets
 
     def get_currently_occluded_area(self):
         # Get all the shadow polygons:
