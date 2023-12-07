@@ -1,0 +1,2 @@
+commonroad-io==2022.3
+numpy==1.21.6
