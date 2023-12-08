@@ -25,7 +25,11 @@ def print_time_dict(time_dict):
         print(key)
         print("-" * 80)
         for step, value in zip(steps, values):
-            print("\t" + step + " " * (30 - len(step)) + str(round(value * 1000, 2)) + 'ms')
+            number = str(round(value * 1000, 2))
+            print("\t" + step + " " * (30 - len(step)) + number + " " * (10 - len(number)) + 'ms')
+        print('\t' + ' '*30 + '_' * 12 + '+')
+        number = str(round(values.sum() * 1000, 2))
+        print("\t" + '' + " " * (30 - len('')) + number + " " * (10 - len(number)) + 'ms')
         print()
 
 def mean_time_dicts2(time_dicts):
