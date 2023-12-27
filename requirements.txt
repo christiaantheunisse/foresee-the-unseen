@@ -1,6 +1,8 @@
-commonroad-io==2021.1
-sumocr==2021.1
+commonroad-io==2022.3
+commonroad-drivability-checker==2022.2
 jupyter
 matplotlib
-numpy
+numpy==1.21.6
+shapely==1.8.5
 pyyaml
+scipy

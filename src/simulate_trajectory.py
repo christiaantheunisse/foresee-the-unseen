@@ -145,7 +145,14 @@ def step_simulation(scenario, configuration):
         car_shape,
         obstacle_state2,
     )
-    scenario.add_objects([parked_car1, parked_car2])
+    obstacle_state3 = InitialState(position=np.array([7 + configuration.get("vehicle_length"), -18]), orientation=0, time_step=0)
+    parked_car3 = StaticObstacle(
+        scenario.generate_object_id(),
+        ObstacleType.CAR,
+        car_shape,
+        obstacle_state3,
+    )
+    scenario.add_objects([parked_car1, parked_car2, parked_car3])
     # scenario.add_objects(parked_car2)
     # scenario.remove_obstacle(parked_car2)
 
