@@ -1,5 +1,5 @@
 #GENERAL
-simulation_duration : 100
+simulation_duration : 30
 
 #EGO_VEHICLE
 initial_state_x : 2
@@ -23,7 +23,7 @@ safety_margin : 5
 #SENSOR
 field_of_view_degrees : 360
 min_resolution : 1
-view_range : 400
+view_range : 500
 
 #OCCLUSION_TRACKER
 min_velocity : 0
@@ -31,3 +31,8 @@ max_velocity : 10
 min_shadow_area : 1
 prediction_horizon : 50
 tracking_enabled : True
+
+#DETECTED OBSTACLES:
+obstacle_min_width: 2
+obstacle_min_length: 5
+orientation_margin: 0.1  # radians

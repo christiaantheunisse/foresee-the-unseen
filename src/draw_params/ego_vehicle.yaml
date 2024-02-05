@@ -159,7 +159,7 @@ trajectory:
   time_begin: 0
   time_end: 1
   antialiased: true
-  draw_trajectory: false
+  draw_trajectory: true
   facecolor: k
   draw_continuous: false
   line_width: 0.17

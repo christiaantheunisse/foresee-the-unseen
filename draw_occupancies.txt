@@ -1,0 +1,12 @@
+In the following file in the commonroad-io package:
+    commonroad > visualization > mp_renderer.py 
+
+In:
+    class MPRenderer
+In:
+    function draw_dynamic_obstacles()
+
+change the line:
+    if draw_occupancies and type(obj.prediction) == commonroad.prediction.prediction.SetBasedPrediction:
+to:
+    if draw_occupancies:
